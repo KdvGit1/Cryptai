@@ -4,15 +4,47 @@ import numpy as np
 import talib
 from datetime import datetime, timedelta
 
+_EXCHANGE_CACHE={}
+
+def get_exchange_instance(exchange_name="binance"):
+    """
+    Borsa nesnesini oluşturur veya varsa hafızadan getirir (Singleton).
+    """
+    exchange_name = exchange_name.lower()
+
+    # 1. Eğer hafızada varsa DİREKT ONU DÖNDÜR
+    if exchange_name in _EXCHANGE_CACHE:
+        return _EXCHANGE_CACHE[exchange_name]
+
+    # 2. Yoksa YENİ OLUŞTUR
+    print(f"🔌 {exchange_name.upper()} bağlantısı ilk kez kuruluyor... (Piyasalar yükleniyor)")
+
+    if exchange_name == "binance":
+        exchange = ccxt.binance({
+            'enableRateLimit': True,
+            'options': {'defaultType': 'future'}
+        })
+    elif exchange_name == "bitget":
+        exchange = ccxt.bitget({
+            'enableRateLimit': True,
+            'options': {'defaultType': 'future'}
+        })
+    else:
+        raise ValueError(f"{exchange_name} is not supported yet. Please appeal to developers.")
+
+    # Piyasaları yükle (Bu işlem ağırdır, artık sadece 1 kere yapılacak)
+    exchange.load_markets()
+
+    # 3. Hafızaya kaydet
+    _EXCHANGE_CACHE[exchange_name] = exchange
+    return exchange
+
 # ==========================================
 # 1. VERİ ÇEKME KATMANI
 # ==========================================
-def get_crypto_history(symbol, timeframe, months_back):
+def get_crypto_history(symbol, timeframe, months_back,exchange_name="binance"):
     """Borsadan ham mum verilerini çeker."""
-    exchange = ccxt.binance({
-        'enableRateLimit': True,
-        'options': {'defaultType': 'future'}
-    })
+    exchange = get_exchange_instance(exchange_name)
 
     now = datetime.now()
     start_date = now - timedelta(days=30 * months_back)
@@ -53,58 +85,63 @@ def get_crypto_history(symbol, timeframe, months_back):
 # 2. İNDİKATÖR HESAPLAMA KATMANI
 # ==========================================
 def add_smart_indicators(df):
-    """Yapay zeka için gerekli matematiksel hesaplamaları yapar."""
+    """
+    Hem AI için oranları hem de İnsanlar için gerçek değerleri hesaplar.
+    """
     df = df.copy()
 
-    # --- Hacim ve Heikin Ashi ---
-    df['HA_Close'] = (df['Open'] + df['High'] + df['Low'] + df['Close']) / 4
-    ha_open = [df['Open'].iloc[0]]
-    for i in range(1, len(df)):
-        ha_open.append((ha_open[-1] + df['HA_Close'].iloc[i-1]) / 2)
-    df['HA_Open'] = ha_open
+    # --- HAM İNDİKATÖRLER (İnsanlar ve Grafik İçin) ---
+    # Bunları JSON'a koyacağız ki kullanıcı "SMA kaç?" diye bakabilsin.
 
-    # Not: HA High/Low AI için ham fiyat olduğundan oranlamak lazım,
-    # şimdilik indikatör hesaplarında kullanmak için tutuyoruz.
+    # Hareketli Ortalamalar
+    df['SMA_50_Val'] = talib.SMA(df['Close'], timeperiod=50)  # Örn: 94500.5
+    df['EMA_200_Val'] = talib.EMA(df['Close'], timeperiod=200)  # Örn: 92100.0
+
+    # Bollinger Bands (Ham Değerler)
+    upper, middle, lower = talib.BBANDS(df['Close'], timeperiod=20)
+    df['BB_Upper_Val'] = upper
+    df['BB_Middle_Val'] = middle
+    df['BB_Lower_Val'] = lower
+
+    # Osilatörler (Bunlar zaten 0-100 arası olduğu için hem AI hem İnsan okuyabilir)
+    df['RSI'] = talib.RSI(df['Close'], timeperiod=14)
+    df['ATR_Val'] = talib.ATR(df['High'], df['Low'], df['Close'], timeperiod=14)
+
+    # MACD (Ham Değerler)
+    macd, macdsignal, macdhist = talib.MACD(df['Close'])
+    df['MACD_Val'] = macd
+    df['MACD_Signal_Val'] = macdsignal
+    df['MACD_Hist_Val'] = macdhist
+
+    # --- AI İÇİN DÖNÜŞÜMLER (Feature Engineering) ---
+    # Bu sütunlar modele girecek, kullanıcıya göstermeye gerek yok (Kafa karıştırır)
+
+    # Fiyatın ortalamalara uzaklığı (Oran)
+    df['Dist_SMA_50'] = (df['Close'] - df['SMA_50_Val']) / df['SMA_50_Val']
+    df['Dist_EMA_200'] = (df['Close'] - df['EMA_200_Val']) / df['EMA_200_Val']
+
+    # Bollinger %B ve Genişlik
+    df['BB_PctB'] = (df['Close'] - lower) / (upper - lower)
+    df['BB_Width'] = (upper - lower) / middle
+
+    # MACD Normalize
+    df['MACD_Norm'] = df['MACD_Val'] / df['Close']
+
+    # ATR Yüzdesi
+    df['ATR_Pct'] = df['ATR_Val'] / df['Close']
 
     # Hacim Analizi
     df['Vol_SMA_20'] = talib.SMA(df['Volume'], timeperiod=20)
     df['Vol_Ratio'] = df['Volume'] / df['Vol_SMA_20']
     df['Vol_Spike'] = (df['Vol_Ratio'] > 2.0).astype(int)
 
-    # --- Hareketli Ortalamalar (Distance - Uzaklık) ---
-    sma_50 = talib.SMA(df['Close'], timeperiod=50)
-    df['Dist_SMA_50'] = (df['Close'] - sma_50) / sma_50
-
-    ema_200 = talib.EMA(df['Close'], timeperiod=200)
-    df['Dist_EMA_200'] = (df['Close'] - ema_200) / ema_200
-
-    # --- Bollinger Bands (%B ve Width) ---
-    upper, middle, lower = talib.BBANDS(df['Close'], timeperiod=20)
-    df['BB_PctB'] = (df['Close'] - lower) / (upper - lower)
-    df['BB_Width'] = (upper - lower) / middle
-
-    # --- Osilatörler ---
-    df['RSI'] = talib.RSI(df['Close'], timeperiod=14) / 100.0
-
-    macd, macdsignal, macdhist = talib.MACD(df['Close'])
-    df['MACD_Norm'] = macd / df['Close']
-
-    df['ATR'] = talib.ATR(df['High'], df['Low'], df['Close'], timeperiod=14)
-    df['ATR_Pct'] = df['ATR'] / df['Close']
-
-    # Saat 23:00 (23) ile 00:00 (0) sayısal olarak uzaktır ama zamansal olarak yakındır.
-    # Sin/Cos dönüşümü bu yakınlığı modele öğretir.
-
-    # 24 Saatlik Döngü
+    # Zaman Döngüleri
     df['Hour_Sin'] = np.sin(2 * np.pi * df.index.hour / 24)
     df['Hour_Cos'] = np.cos(2 * np.pi * df.index.hour / 24)
-
-    # 7 Günlük Döngü (Hafta sonu etkisi için)
     df['Day_Sin'] = np.sin(2 * np.pi * df.index.dayofweek / 7)
     df['Day_Cos'] = np.cos(2 * np.pi * df.index.dayofweek / 7)
 
-    # --- KRİTİK EKLEME: Log Returns (Hedef Değişken) ---
-    # Modelin neyi tahmin edeceğini (veya geçmiş hareketi) bilmesi için
+    # Hedef (Log Return)
     df['Log_Ret'] = np.log(df['Close'] / df['Close'].shift(1))
 
     return df
@@ -114,30 +151,30 @@ def add_smart_indicators(df):
 # ==========================================
 def prepare_dual_dataframes(df):
     """
-    Hesaplanmış DataFrame'i alır, NaN'ları temizler ve ikiye ayırır.
-    Return: (df_original, df_ai)
+    Veriyi 3 parçaya ayırır:
+    1. Display (Kullanıcı için ham indikatörler)
+    2. AI (Model için normalize veriler)
     """
-    # 1. Önce hesaplamaları yap
     df_calculated = add_smart_indicators(df)
-
-    # 2. NaN (Boş) satırları temizle
-    # İndikatörler (EMA 200 gibi) ilk 200 satırı boş bırakır.
-    # Bunları silmezsek AI hata verir.
     df_clean = df_calculated.dropna()
-
     print(f"🧹 Temizlik: İlk {len(df_calculated) - len(df_clean)} satır (NaN) silindi.")
 
-    # 3. Sütunları Seç ve Ayır
+    # A) DISPLAY DATA (Kullanıcıya Gösterilecekler)
+    # Fiyatlar + Ham İndikatör Değerleri
+    display_cols = [
+        'Open', 'High', 'Low', 'Close', 'Volume', # Temel
+        'RSI',                                    # Popüler
+        'SMA_50_Val', 'EMA_200_Val',              # Ortalamalar
+        'BB_Upper_Val', 'BB_Lower_Val',           # Bollinger Sınırları
+        'MACD_Val', 'MACD_Signal_Val',            # Trend Gücü
+        'ATR_Val'                                 # Volatilite (Dolar bazında)
+    ]
+    df_display = df_clean[display_cols].copy()
 
-    # A) Orijinal (Vitrin) Verisi: Fiyatlar, Tarih, Hacim
-    original_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
-    df_original = df_clean[original_cols].copy()
-
-    # B) AI (Mutfak) Verisi: Sadece Oranlar, Yüzdeler, 0-1 arası değerler
-    # Ham fiyatları (Open, High vb.) BURAYA ALMIYORUZ.
+    # B) AI DATA (Modele Girecekler)
     ai_cols = [
-        'Log_Ret',      # En önemli veri (Değişim oranı)
-        'RSI',
+        'Log_Ret',
+        'RSI', # RSI'ı AI için de kullanıyoruz (Normalize etmeye gerek yok, 0-100 arası okur)
         'Dist_SMA_50',
         'Dist_EMA_200',
         'BB_PctB',
@@ -146,14 +183,11 @@ def prepare_dual_dataframes(df):
         'ATR_Pct',
         'Vol_Ratio',
         'Vol_Spike',
-        'Hour_Sin',
-        'Hour_Cos',
-        'Day_Sin',
-        'Day_Cos'
+        'Hour_Sin', 'Hour_Cos', 'Day_Sin', 'Day_Cos'
     ]
     df_ai = df_clean[ai_cols].copy()
 
-    return df_original, df_ai
+    return df_display, df_ai
 
 def workflow_runner(coin_name,desired_month, desired_timeframes):
     """Tüm süreci yöneten ana fonksiyon."""
@@ -181,5 +215,5 @@ def workflow_runner(coin_name,desired_month, desired_timeframes):
         print(f"💾 Kaydedildi:\n  -> {file_orig}\n  -> {file_ai}")
         print("-" * 40)
 
-# --- ÇALIŞTIRMA ---
-workflow_runner("ETH",6, ('5m', '15m', '1h'))
+if __name__ == "__main__":
+    workflow_runner("ETH",6, ('5m', '15m', '1h'))
