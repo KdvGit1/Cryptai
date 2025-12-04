@@ -2,10 +2,80 @@ import ccxt
 import pandas as pd
 import json
 import os
+import numpy as np
+import torch
 from datetime import datetime
 from train_transformer_models.data_fetcher import get_crypto_history, prepare_dual_dataframes
+from train_transformer_models.ai_engine import CryptoTransformer
 
 JSON_FILENAME = "live_market_data.json"
+
+MODEL_MAP = {
+    '5m' : 'train_transformer_models/finalized_models/ETH_TUNED_5m_MODEL.pth',
+    '15m' : 'train_transformer_models/finalized_models/ETH_TUNED_15m_MODEL.pth',
+    '1h' : 'train_transformer_models/finalized_models/ETH_TUNED_1h_MODEL.pth'
+}
+
+MODEL_CONFIG = {
+    'input_dim': 14,
+    'd_model': 256,
+    'nhead': 8,
+    'num_layers': 4,
+    'seq_len': 120,
+    'output_dim': 1
+}
+
+_MODEL_CACHE = {}
+_DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def load_ai_model(timeframe):
+    """
+    İstenilen timeframe için doğru modeli yükler ve hafızada tutar.
+    """
+    global _MODEL_CACHE
+
+    # 1. Cache Kontrolü
+    if timeframe in _MODEL_CACHE:
+        return _MODEL_CACHE[timeframe]
+
+    # 2. Dosya Yolunu Bul
+    if timeframe not in MODEL_MAP:
+        print(f"❌ '{timeframe}' için tanımlı bir model yok! (MODEL_MAP'i kontrol et)")
+        return None
+
+    model_path = MODEL_MAP[timeframe]
+
+    if not os.path.exists(model_path):
+        print(f"❌ Model dosyası bulunamadı: {model_path}")
+        return None
+
+    print(f"🧠 '{timeframe}' için Yapay Zeka Modeli Yükleniyor: {model_path} ...")
+
+    # 3. Modeli Oluştur
+    try:
+        model = CryptoTransformer(
+            input_dim=MODEL_CONFIG['input_dim'],
+            d_model=MODEL_CONFIG['d_model'],
+            nhead=MODEL_CONFIG['nhead'],
+            num_layers=MODEL_CONFIG['num_layers']
+            # output_dim parametresi class'ında varsa ekle
+        ).to(_DEVICE)
+
+        # 4. Ağırlıkları Yükle
+        state_dict = torch.load(model_path, map_location=_DEVICE, weights_only=True)
+        clean_state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+        model.load_state_dict(clean_state_dict)
+
+        model.eval()  # Sınav modu
+
+        # 5. Cache'e At
+        _MODEL_CACHE[timeframe] = model
+        return model
+
+    except Exception as e:
+        print(f"❌ Model yükleme hatası ({timeframe}): {e}")
+        return None
 
 def get_available_exhanges():
     return ccxt.exchanges
@@ -49,13 +119,17 @@ def calculate_needed_months(timeframe_str, candle_count=500):
     return months_needed
 
 
-# --- SENİN FONKSİYONUN GÜNCELLENMİŞ HALİ ---
 def scan_market(timeframe, exchange_name="binance"):
     # 1. Kaç ay (float) gerektiğin hesapla
     # Örn: 1h için yaklaşık 0.7, 5m için 0.06 döner.
     months_to_fetch = calculate_needed_months(timeframe, candle_count=500)
 
     print(f"🛠️ {timeframe} için son 500 mum yaklaşık {months_to_fetch:.4f} ay ediyor.")
+
+    ai_model = load_ai_model(timeframe)
+
+    if ai_model is None:
+        print("⚠️ Model YÜKLENEMEDİ! Tahminler 0.0 olacak.")
 
     all_pairs = get_all_pairs(exchange_name)
     market_data_storage = {}
@@ -86,6 +160,25 @@ def scan_market(timeframe, exchange_name="binance"):
             df_display, df_ai = prepare_dual_dataframes(raw_df)
 
             ai_prediction_value = 0.0 #şimdilik böyle
+
+            if ai_model is not None and len(df_ai) >= MODEL_CONFIG['seq_len']:
+                # Model son 120 mumu istiyor
+                input_data = df_ai.tail(MODEL_CONFIG['seq_len']).values
+                # Eğer veride hala NaN veya Sonsuz varsa bu coini atla
+                if np.isnan(input_data).any() or np.isinf(input_data).any():
+                    print(f"⚠️ {pair}: Veri bozuk (NaN/Inf tespit edildi), atlanıyor.")
+                    continue
+                input_tensor = torch.tensor(input_data, dtype=torch.float32).unsqueeze(0).to(_DEVICE)
+
+                #DEBUG RSI ORTALAMSI
+                print(f"Debug Input Mean: {input_data.mean():.4f}")
+                with torch.no_grad():
+                    output = ai_model(input_tensor).item()
+
+                # REVERSE SCALING
+                ai_prediction_value = output / 100.0
+
+                print(f"   🤖 AI Tahmini ({timeframe}): %{ai_prediction_value * 100:.4f}")
 
             export_df = df_display.copy()
             export_df.reset_index(inplace=True)
@@ -120,4 +213,5 @@ def scan_market(timeframe, exchange_name="binance"):
 
 if __name__ == "__main__":
     scan_market("1h","binance")
+    scan_market("15m","binance")
     scan_market("5m","bitget")

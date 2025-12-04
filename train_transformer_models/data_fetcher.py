@@ -156,6 +156,7 @@ def prepare_dual_dataframes(df):
     2. AI (Model için normalize veriler)
     """
     df_calculated = add_smart_indicators(df)
+    df_calculated = df_calculated.replace([np.inf, -np.inf], np.nan)
     df_clean = df_calculated.dropna()
     print(f"🧹 Temizlik: İlk {len(df_calculated) - len(df_clean)} satır (NaN) silindi.")
 
