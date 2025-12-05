@@ -11,16 +11,16 @@ from train_transformer_models.ai_engine import CryptoTransformer
 JSON_FILENAME = "live_market_data.json"
 
 MODEL_MAP = {
-    '5m' : 'train_transformer_models/finalized_models/ETH_TUNED_5m_MODEL.pth',
-    '15m' : 'train_transformer_models/finalized_models/ETH_TUNED_15m_MODEL.pth',
-    '1h' : 'train_transformer_models/finalized_models/ETH_TUNED_1h_MODEL.pth'
+    '5m' : 'train_transformer_models/finalized_models/BTC_36Ay_5m_MODEL.pth',
+    '15m' : 'train_transformer_models/finalized_models/BTC_36Ay_15m_MODEL.pth',
+    '1h' : 'train_transformer_models/finalized_models/BTC_36Ay_1h_MODEL.pth'
 }
 
 MODEL_CONFIG = {
     'input_dim': 14,
-    'd_model': 256,
-    'nhead': 8,
-    'num_layers': 4,
+    'd_model': 128,
+    'nhead': 4,
+    'num_layers': 2,
     'seq_len': 120,
     'output_dim': 1
 }
@@ -159,7 +159,7 @@ def scan_market(timeframe, exchange_name="binance"):
 
             df_display, df_ai = prepare_dual_dataframes(raw_df)
 
-            ai_prediction_value = 0.0 #şimdilik böyle
+            ai_prediction_value = 0.0
 
             if ai_model is not None and len(df_ai) >= MODEL_CONFIG['seq_len']:
                 # Model son 120 mumu istiyor

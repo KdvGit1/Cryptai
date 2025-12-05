@@ -217,4 +217,4 @@ def workflow_runner(coin_name,desired_month, desired_timeframes):
         print("-" * 40)
 
 if __name__ == "__main__":
-    workflow_runner("BTC",36, ('5m', '15m', '1h'))
+    workflow_runner("ETH",36, ('5m', '15m', '1h'))
