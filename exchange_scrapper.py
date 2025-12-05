@@ -105,7 +105,7 @@ def calculate_needed_months(timeframe_str, candle_count=500):
         tf_minutes = 5
     else:
         # Bilinmeyen bir time frame ise varsayılan 1 ay döndür
-        return 1.0
+        return 60
 
         # 2. Toplam gereken dakika (500 mum * periyot)
     total_minutes = candle_count * tf_minutes

@@ -103,7 +103,6 @@ def add_smart_indicators(df):
     df['BB_Middle_Val'] = middle
     df['BB_Lower_Val'] = lower
 
-    # Osilatörler (Bunlar zaten 0-100 arası olduğu için hem AI hem İnsan okuyabilir)
     df['RSI'] = talib.RSI(df['Close'], timeperiod=14)
     df['ATR_Val'] = talib.ATR(df['High'], df['Low'], df['Close'], timeperiod=14)
 
@@ -175,7 +174,7 @@ def prepare_dual_dataframes(df):
     # B) AI DATA (Modele Girecekler)
     ai_cols = [
         'Log_Ret',
-        'RSI', # RSI'ı AI için de kullanıyoruz (Normalize etmeye gerek yok, 0-100 arası okur)
+        'RSI',
         'Dist_SMA_50',
         'Dist_EMA_200',
         'BB_PctB',
@@ -187,6 +186,7 @@ def prepare_dual_dataframes(df):
         'Hour_Sin', 'Hour_Cos', 'Day_Sin', 'Day_Cos'
     ]
     df_ai = df_clean[ai_cols].copy()
+    df_ai['RSI'] = df_ai['RSI'] / 100.0
 
     return df_display, df_ai
 
@@ -217,4 +217,4 @@ def workflow_runner(coin_name,desired_month, desired_timeframes):
         print("-" * 40)
 
 if __name__ == "__main__":
-    workflow_runner("ETH",6, ('5m', '15m', '1h'))
+    workflow_runner("BTC",36, ('5m', '15m', '1h'))
