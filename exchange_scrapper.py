@@ -211,7 +211,90 @@ def scan_market(timeframe, exchange_name="binance"):
     else:
         print("⚠️ Kaydedilecek veri bulunamadı.")
 
+def scan_single_coin(coin_name, timeframe, exchange_name="binance"):
+    """
+    Tek bir coin için analiz yapar ve sonucu JSON formatına uygun bir sözlük olarak döndürür.
+    Dosyaya YAZMAZ, return eder.
+    """
+    # 1. Girdileri Düzenle
+    coin_name = coin_name.upper()
+    # Eğer kullanıcı zaten 'BTC/USDT' girdiyse bozma, sadece 'BTC' girdiyse sonuna ekle
+    if "/" not in coin_name:
+        pair = f"{coin_name}/USDT"
+    else:
+        pair = coin_name
+
+    exchange_name = exchange_name.lower()
+
+    # 2. Modeli Yükle
+    ai_model = load_ai_model(timeframe)
+
+    # 3. Gereken Veri Süresini Hesapla
+    months_to_fetch = calculate_needed_months(timeframe, candle_count=500)
+
+    try:
+        # 4. Veriyi Çek
+        df = get_crypto_history(
+            symbol=pair,
+            timeframe=timeframe,
+            months_back=months_to_fetch,
+            exchange_name=exchange_name
+        )
+
+        if len(df) < 120:
+            return {pair: {"error": "Yetersiz veri", "candles": len(df)}}
+
+        # 5. Veriyi Kes (Son 500 mum)
+        if len(df) > 500:
+            raw_df = df.tail(500)
+        else:
+            raw_df = df
+
+        print(f"✅ {pair} -> {len(raw_df)} mum alındı. Analiz yapılıyor...")
+
+        # 6. İndikatörleri Hesapla
+        df_display, df_ai = prepare_dual_dataframes(raw_df)
+
+        ai_prediction_value = 0.0
+
+        # 7. AI Tahmini Yap
+        if ai_model is not None and len(df_ai) >= MODEL_CONFIG['seq_len']:
+            input_data = df_ai.tail(MODEL_CONFIG['seq_len']).values
+
+            # Veri bütünlüğü kontrolü
+            if np.isnan(input_data).any() or np.isinf(input_data).any():
+                return {pair: {"error": "Veri bozuk (NaN/Inf tespit edildi)"}}
+
+            input_tensor = torch.tensor(input_data, dtype=torch.float32).unsqueeze(0).to(_DEVICE)
+
+            with torch.no_grad():
+                output = ai_model(input_tensor).item()
+
+            # Reverse Scaling (Modelin çıktısı 100 ile çarpılmışsa)
+            ai_prediction_value = output / 100.0
+
+        # 8. Sonuç Formatını Hazırla (JSON yapısıyla birebir aynı)
+        export_df = df_display.copy()
+        export_df.reset_index(inplace=True)
+        # Tarihi stringe çevir
+        export_df['Date'] = export_df['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        result_data = {
+            pair: {
+                "last_indicators": export_df.tail(5).to_dict(orient='records'),
+                "ai_prediction": ai_prediction_value,
+                "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+        }
+
+        return result_data
+
+    except Exception as e:
+        print(f"❌ Hata ({pair}): {e}")
+        return {pair: {"error": str(e)}}
+
+
 if __name__ == "__main__":
     scan_market("1h","binance")
-    scan_market("15m","binance")
-    scan_market("5m","bitget")
+    #scan_market("15m","binance")
+    #scan_market("5m","bitget")
