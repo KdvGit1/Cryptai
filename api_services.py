@@ -24,7 +24,6 @@ def api_scan_market(timeframe: str, exchange_name: str):
 
 @app.get("/get_last_data")
 def api_get_last_data():
-    last_update_time = 0
     if os.path.exists("live_market_data.json"):
         with open("live_market_data.json", "r",encoding='utf-8') as f:
             data = json.load(f)
@@ -44,6 +43,9 @@ def api_get_coin_data(coin_name: str):
             data = json.load(f)
             coin_data = data.get(f"{coin_name}/USDT")
             return coin_data
+    else:
+        raise fastapi.HTTPException(status_code=404, detail="live_market_data.json not found.")
+
 
 @app.get("/scan_coin/{timeframe}/{exchange_name}/{coin_name}")
 def api_scan_coin(timeframe:str,exchange_name:str,coin_name: str):
@@ -54,3 +56,7 @@ def api_scan_coin(timeframe:str,exchange_name:str,coin_name: str):
         raise fastapi.HTTPException(status_code=404, detail=f"{coin_name} not found in {exchange_name} exchange.")
     else:
         return scan_single_coin(coin_name, timeframe, exchange_name)
+
+@app.get("/get_available_exchanges")
+def api_get_available_exchanges():
+    return get_available_exhanges()
