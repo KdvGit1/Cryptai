@@ -1,0 +1,119 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\gridlengthanimation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\gridlengthanimation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\marketdataresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\marketdataresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\starcontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\starcontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|c:\\users\\mertcan\\desktop\\software\\c#\\cryptai\\cryptai\\starcontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}|CRYPTAI\\CRYPTAI.csproj|solutionrelative:cryptai\\starcontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "CRYPTAI\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MainWindow.xaml.cs",
+              "RelativeToolTip": "CRYPTAI\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAIUBAAAAAAAAAADwv60BAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-20T11:22:05.238Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GridLengthAnimation.cs",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\GridLengthAnimation.cs",
+              "RelativeDocumentMoniker": "CRYPTAI\\GridLengthAnimation.cs",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\GridLengthAnimation.cs",
+              "RelativeToolTip": "CRYPTAI\\GridLengthAnimation.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAUwCQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T19:44:33.394Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "CRYPTAI\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MainWindow.xaml",
+              "RelativeToolTip": "CRYPTAI\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-07T15:16:34.751Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MarketDataResponse.cs",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MarketDataResponse.cs",
+              "RelativeDocumentMoniker": "CRYPTAI\\MarketDataResponse.cs",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\MarketDataResponse.cs",
+              "RelativeToolTip": "CRYPTAI\\MarketDataResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-07T14:16:48.925Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "StarControl.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\StarControl.xaml.cs",
+              "RelativeDocumentMoniker": "CRYPTAI\\StarControl.xaml.cs",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\StarControl.xaml.cs",
+              "RelativeToolTip": "CRYPTAI\\StarControl.xaml.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAkwEYAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T08:00:24.812Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "StarControl.xaml",
+              "DocumentMoniker": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\StarControl.xaml",
+              "RelativeDocumentMoniker": "CRYPTAI\\StarControl.xaml",
+              "ToolTip": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\StarControl.xaml",
+              "RelativeToolTip": "CRYPTAI\\StarControl.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-10-25T08:00:02.086Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

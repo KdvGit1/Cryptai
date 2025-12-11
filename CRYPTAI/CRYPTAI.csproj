@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>IMGS\CRYPTAI.ico</ApplicationIcon>
+    <PackageIcon>CRYPTAI.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="IMGS\closeButton.png" />
+    <None Remove="IMGS\CRYPTAI.ico" />
+    <None Remove="IMGS\CRYPTAII.ico" />
+    <None Remove="IMGS\CRYPTAII.png" />
+    <None Remove="IMGS\homepage.png" />
+    <None Remove="IMGS\Lhomepage.png" />
+    <None Remove="IMGS\LStar.png" />
+    <None Remove="IMGS\minButton.png" />
+    <None Remove="IMGS\Star.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="devexpress.wpf.grid.core" Version="25.1.5" />
+    <PackageReference Include="ScottPlot.WPF" Version="5.1.57" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="IMGS\closeButton.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\CRYPTAI.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\CRYPTAI.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\CRYPTAII.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\CRYPTAII.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\homepage.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\Lhomepage.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\LStar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\minButton.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\Star.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="IMGS\CRYPTAI.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

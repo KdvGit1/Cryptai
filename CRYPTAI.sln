@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRYPTAI", "CRYPTAI\CRYPTAI.csproj", "{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A50ED068-BDBD-467A-A97E-9A2BF6BEFD23}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F04F174-3BE6-4F6F-97A6-E767C36D5C44}
+	EndGlobalSection
+EndGlobal
