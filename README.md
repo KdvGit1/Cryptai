@@ -44,7 +44,7 @@ This project follows a modular architecture to ensure scalability and maintainab
 ### Running the Project
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/CRYPTAI.git](https://github.com/YOUR_USERNAME/CRYPTAI.git)
+    git clone [https://github.com//CRYPTAI.git](https://github.com//CRYPTAI.git)
     ```
 2.  Open `CRYPTAI.sln` in **Visual Studio 2022**.
 3.  Restore NuGet packages.
