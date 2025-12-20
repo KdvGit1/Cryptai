@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hgyBBqly3nk=",
+  "dgSpecHash": "HnkC0k9fTKI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\MERTCAN\\Desktop\\CRYPTAI 20-12-2025\\CRYPTAI\\CRYPTAI.csproj",
+  "projectFilePath": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\DevExpress 25.1\\Components\\Offline Packages\\devexpress.data\\25.1.5\\devexpress.data.25.1.5.nupkg.sha512",
     "C:\\Program Files\\DevExpress 25.1\\Components\\Offline Packages\\devexpress.data.desktop\\25.1.5\\devexpress.data.desktop.25.1.5.nupkg.sha512",
@@ -58,9 +58,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'SkiaSharp.Views.WPF 3.119.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0-windows7.0'. This package may not be fully compatible with your project.",
-      "projectPath": "C:\\Users\\MERTCAN\\Desktop\\CRYPTAI 20-12-2025\\CRYPTAI\\CRYPTAI.csproj",
+      "projectPath": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\MERTCAN\\Desktop\\CRYPTAI 20-12-2025\\CRYPTAI\\CRYPTAI.csproj",
+      "filePath": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj",
       "libraryId": "SkiaSharp.Views.WPF",
       "targetGraphs": [
         "net8.0-windows7.0"

@@ -184,23 +184,22 @@ namespace CRYPTAI
         private void ShowStartupBanner()
         {
             string banner = @"
-        _________________________________________________
-              
-              .---.                 CRYPTAI  
-             /   _ \        INTELLIGENT TRADING SYSTEM
-         o--|  |_) |     v1.0.4 - Stable Build
-            |   _ <      Powered by: Python AI & .NET 8
-         o--|  |_) |      
-             \_____/         SYSTEM STATUS: [ONLINE]
-                             MODE: AUTOMATIC
-        _________________________________________________
-        ";
+_________________________________________________
+
+      .---.                  CRYPTAI  
+     /   _ \        INTELLIGENT TRADING SYSTEM
+ o--|  |_) |      v1.0.4 - Stable Build
+    |   _ <       Powered by: Python AI & .NET 8
+ o--|  |_) |      
+     \_____/         SYSTEM STATUS: [ONLINE]
+                     MODE: AUTOMATIC
+_________________________________________________
+";
+
             Dispatcher.Invoke(() =>
             {
-                {
-                    TerminalOutput.AppendText(banner + "\n");
-                    TerminalOutput.ScrollToEnd();
-                }
+                TerminalOutput.AppendText(banner + "\n");
+                TerminalOutput.ScrollToEnd();
             });
         }
         private void SetupDataGrids()

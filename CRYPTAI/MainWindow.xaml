@@ -134,7 +134,7 @@
 
                 <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,5">
-                         <TextBlock Text="Exchange:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Exchange:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
                         <ComboBox Width="100" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
                             <ComboBoxItem Content="BINANCE"/>
                         </ComboBox>
@@ -142,7 +142,7 @@
                         <ComboBox Width="80" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
                             <ComboBoxItem Content="15M"/>
                         </ComboBox>
-                        </StackPanel>
+                    </StackPanel>
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <TextBlock Text="Search Symbol:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center" FontFamily="Titillium Web SemiBold"/>
@@ -259,7 +259,11 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Text="> LIVE SYSTEM LOGS" Foreground="#00FFFF" FontSize="10" Margin="5,2,0,2" FontFamily="Consolas" FontWeight="Bold"/>
-                                    <TextBox x:Name="TerminalOutput" Grid.Row="1" Background="Transparent" Foreground="#00FFFF" FontFamily="Consolas" FontSize="11" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Padding="5"/>
+                                    <TextBox x:Name="TerminalOutput" Grid.Row="1" Foreground="#00FFFF" FontFamily="Consolas" FontSize="11" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Padding="5">
+                                        <TextBox.Background>
+                                            <ImageBrush ImageSource="/CRYPTAIII.png" Stretch="Uniform" Opacity="0.05"/>
+                                        </TextBox.Background>
+                                    </TextBox>
                                 </Grid>
                             </Border>
                         </Grid>

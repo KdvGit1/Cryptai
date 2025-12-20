@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CRYPTAIII.png" />
     <None Remove="IMGS\closeButton.png" />
     <None Remove="IMGS\CRYPTAI.ico" />
     <None Remove="IMGS\CRYPTAII.ico" />
@@ -27,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="CRYPTAIII.png" />
     <Resource Include="IMGS\closeButton.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CRYPTAI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa3ec3064b7fbec3cf442e89888447435278057f")]
 [assembly: System.Reflection.AssemblyProductAttribute("CRYPTAI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CRYPTAI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
