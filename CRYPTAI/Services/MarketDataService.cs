@@ -105,8 +105,22 @@ namespace CRYPTAI.Services
         {
             using (var scanClient = new HttpClient())
             {
+                // Zaman aşımını koruyoruz
                 scanClient.Timeout = TimeSpan.FromMinutes(20);
-                await scanClient.GetAsync(ScanUrl);
+
+                // İsteği gönderiyoruz
+                var response = await scanClient.GetAsync(ScanUrl);
+
+                // KRİTİK HAMLE 1: Eğer sunucu 200 OK dışında bir şey (404, 500 vs.) dönerse
+                // bu satır kodun akışını keser ve HATA fırlatır (Exception).
+                // Böylece MainWindow "Başarılı" mesajı göstermez, Catch bloğuna düşer.
+                response.EnsureSuccessStatusCode();
+
+                // KRİTİK HAMLE 2: Sunucudan gelen mesajı okuyoruz (İsteğe bağlı loglama için)
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                // Debug için çıktı penceresine yazdıralım
+                System.Diagnostics.Debug.WriteLine($"SCAN RESPONSE: {responseContent}");
             }
         }
     }

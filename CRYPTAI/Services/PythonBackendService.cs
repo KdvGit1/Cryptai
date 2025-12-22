@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CRYPTAI.Services
 {
@@ -18,93 +19,106 @@ namespace CRYPTAI.Services
         // Sonsuz döngüye girmemesi için bayrak
         private bool _isRecoveryTriggered = false;
 
-        public void StartBackend(bool forceCheck = false)
+        public async Task StartBackend(bool forceCheck = false)
         {
-            try
+            await Task.Run(() =>
             {
-                _isRecoveryTriggered = false; // Her başlatmada sıfırla
-
-                string exePath = AppDomain.CurrentDomain.BaseDirectory;
-                string projectPath = Path.Combine(exePath, "CryptoBackend");
-
-                if (!Directory.Exists(projectPath))  projectPath = Path.GetFullPath(Path.Combine(exePath, @"..\..\..\CryptoBackend")); 
-
-                if (!Directory.Exists(projectPath))
+                try
                 {
-                    OnLogReceived?.Invoke("KRİTİK HATA: Backend dizini bulunamadı! Operasyon durduruldu.");
-                    return;
-                }
+                    _isRecoveryTriggered = false; 
 
-                // Kütüphane kontrolü (İlk açılış veya zorunlu kontrol)
-                if (forceCheck || !Properties.Settings.Default.IsDependenciesInstalled)
-                {
-                    string reqFile = Path.Combine(projectPath, "requirements.txt");
-                    if (File.Exists(reqFile))
+                    string exePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string projectPath = Path.Combine(exePath, "CryptoBackend");
+
+                    if (!Directory.Exists(projectPath)) projectPath = Path.GetFullPath(Path.Combine(exePath, @"..\..\..\CryptoBackend"));
+
+                    if (!Directory.Exists(projectPath))
                     {
-                        OnLogReceived?.Invoke("SİSTEM: Kütüphane bütünlüğü sağlanıyor...");
-                        bool installSuccess = InstallDependencies(projectPath);
+                        OnLogReceived?.Invoke("KRİTİK HATA: Backend dizini bulunamadı! Operasyon durduruldu.");
+                        return;
+                    }
 
-                        if (installSuccess)
+                    // Kütüphane kontrolü (İlk açılış veya zorunlu kontrol)
+                    if (forceCheck || !Properties.Settings.Default.IsDependenciesInstalled)
+                    {
+                        string reqFile = Path.Combine(projectPath, "requirements.txt");
+                        if (File.Exists(reqFile))
                         {
-                            OnLogReceived?.Invoke("SİSTEM: Kütüphaneler doğrulandı.");
-                            Properties.Settings.Default.IsDependenciesInstalled = true;
-                            Properties.Settings.Default.Save();
-                        }
-                        else
-                        {
-                            OnLogReceived?.Invoke("UYARI: Yükleme tam tamamlanamadı, yine de başlatılıyor.");
+                            OnLogReceived?.Invoke("------------------------------------------------");
+                            OnLogReceived?.Invoke("SİSTEM: Kütüphane bütünlüğü ve kurulumu sağlanıyor...");
+                            OnLogReceived?.Invoke("PIP: İşlem biraz zaman alabilir, lütfen bekleyin...");
+
+                            bool installSuccess = InstallDependencies(projectPath);
+
+                            if (installSuccess)
+                            {
+                                OnLogReceived?.Invoke("✅ SİSTEM: Tüm kütüphaneler başarıyla kuruldu.");
+                                Properties.Settings.Default.IsDependenciesInstalled = true;
+                                Properties.Settings.Default.Save();
+                            }
+                            else
+                            {
+                                OnLogReceived?.Invoke("⚠️ UYARI: Bazı paketler yüklenemedi, yine de başlatılıyor.");
+                            }
+                            OnLogReceived?.Invoke("------------------------------------------------");
                         }
                     }
-                }
-                else
-                {
-                    OnLogReceived?.Invoke("SİSTEM: Kütüphaneler hazır (Önbellek).");
-                }
-
-                // Python sunucusunu başlat
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    Arguments = "/c python -m uvicorn api_services:app --reload",
-                    WorkingDirectory = projectPath,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true, 
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8
-                };
-
-                _pythonProcess = new Process();
-                _pythonProcess.StartInfo = psi;
-
-                // Normal çıktıları logla
-                _pythonProcess.OutputDataReceived += (s, e) =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data)) OnLogReceived?.Invoke(e.Data);
-                };
-
-                // Hataları dinle ve analiz et
-                _pythonProcess.ErrorDataReceived += (s, e) =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data))
+                    else
                     {
-                        OnLogReceived?.Invoke($"> {e.Data}");
-                        CheckForMissingLibraryError(e.Data);
+                        OnLogReceived?.Invoke("SİSTEM: Kütüphaneler hazır (Önbellek).");
                     }
-                };
 
-                _pythonProcess.Start();
-                _pythonProcess.BeginOutputReadLine();
-                _pythonProcess.BeginErrorReadLine();
+                    if (_pythonProcess != null && !_pythonProcess.HasExited)
+                    {
+                        OnLogReceived?.Invoke("SİSTEM: Servis zaten çalışıyor.");
+                        return;
+                    }
 
-                OnLogReceived?.Invoke("BACKEND: Sunucu başlatılıyor...");
-            }
-            catch (Exception ex)
-            {
-                OnLogReceived?.Invoke($"SYSTEM FAILURE: {ex.Message}");
-            }
+                    // Python sunucusunu başlat
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/c python -m uvicorn api_services:app --reload",
+                        WorkingDirectory = projectPath,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8
+                    };
+
+                    psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                    psi.EnvironmentVariables["PYTHONUTF8"] = "1";
+                    _pythonProcess = new Process();
+                    _pythonProcess.StartInfo = psi;
+
+                    _pythonProcess.OutputDataReceived += (s, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data)) OnLogReceived?.Invoke(e.Data);
+                    };
+
+                    _pythonProcess.ErrorDataReceived += (s, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
+                        {
+                            OnLogReceived?.Invoke($"> {e.Data}");
+                            CheckForMissingLibraryError(e.Data);
+                        }
+                    };
+
+                    _pythonProcess.Start();
+                    _pythonProcess.BeginOutputReadLine();
+                    _pythonProcess.BeginErrorReadLine();
+
+                    OnLogReceived?.Invoke("BACKEND: Sunucu başlatılıyor...");
+                }
+                catch (Exception ex)
+                {
+                    OnLogReceived?.Invoke($"SYSTEM FAILURE: {ex.Message}");
+                }
+            });
         }
 
         public void KillProcess()
@@ -126,7 +140,6 @@ namespace CRYPTAI.Services
             catch { }
         }
 
-        // Hata metnini analiz eden metod
         private void CheckForMissingLibraryError(string errorLog)
         {
             if (!_isRecoveryTriggered &&
@@ -157,14 +170,16 @@ namespace CRYPTAI.Services
                 using (var process = new Process())
                 {
                     process.StartInfo = psi;
+
                     process.OutputDataReceived += (s, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data) && (e.Data.Contains("Installing") || e.Data.Contains("Successfully")))
+                        if (!string.IsNullOrWhiteSpace(e.Data))
                             OnLogReceived?.Invoke($"PIP: {e.Data}");
                     };
                     process.ErrorDataReceived += (s, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data)) OnLogReceived?.Invoke($"PIP LOG: {e.Data}");
+                        if (!string.IsNullOrWhiteSpace(e.Data))
+                            OnLogReceived?.Invoke($"PIP LOG: {e.Data}");
                     };
 
                     process.Start();
@@ -176,6 +191,7 @@ namespace CRYPTAI.Services
                     if (!exited)
                     {
                         process.Kill();
+                        OnLogReceived?.Invoke("PIP: Kurulum zaman aşımına uğradı!");
                         return false;
                     }
                     return process.ExitCode == 0;

@@ -6,7 +6,7 @@
         AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterScreen">
 
-    <Border Background="#CC1E222D" BorderBrush="#0ECB81" BorderThickness="1" CornerRadius="10">
+    <Border x:Name="border1" Background="#CC1E222D" BorderBrush="#0ECB81" BorderThickness="1" CornerRadius="10">
         <Border.Effect>
             <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="5" Opacity="0.8"/>
         </Border.Effect>
@@ -28,7 +28,7 @@
                 İşlem başarıyla tamamlandı.
             </TextBlock>
 
-            <Button Content="TAMAM" Click="BtnOk_Click" Grid.Row="2"
+            <Button x:Name="okButton" Content="TAMAM" Click="BtnOk_Click" Grid.Row="2"
                     Width="120" Height="35" Background="#0ECB81" Foreground="#1E222D"
                     FontWeight="Bold" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Center">
                 <Button.Resources>

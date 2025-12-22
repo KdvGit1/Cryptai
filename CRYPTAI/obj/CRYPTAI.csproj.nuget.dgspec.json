@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj": {}
+    "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\CRYPTAI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj": {
+    "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\CRYPTAI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj",
+        "projectUniqueName": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\CRYPTAI.csproj",
         "projectName": "CRYPTAI",
-        "projectPath": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\CRYPTAI.csproj",
+        "projectPath": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\CRYPTAI.csproj",
         "packagesPath": "C:\\Users\\MERTCAN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MERTCAN\\Desktop\\GİTHUB\\CRYPTAI\\obj\\",
+        "outputPath": "C:\\Users\\MERTCAN\\Desktop\\SOFTWARE\\C#\\CRYPTAI\\CRYPTAI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\DevExpress 25.1\\Components\\Offline Packages",
@@ -56,10 +56,6 @@
             "ScottPlot.WPF": {
               "target": "Package",
               "version": "[5.1.57, )"
-            },
-            "devexpress.wpf.grid.core": {
-              "target": "Package",
-              "version": "[25.1.5, )"
             }
           },
           "imports": [
@@ -77,7 +73,7 @@
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             },
-            "Microsoft.WindowsDesktop.App": {
+            "Microsoft.WindowsDesktop.App.WPF": {
               "privateAssets": "none"
             }
           },

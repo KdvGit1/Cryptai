@@ -16,7 +16,9 @@ namespace CRYPTAI
             {
                 TxtIcon.Text = "❌";
                 TxtTitle.Foreground = Brushes.Red;
-                // Border rengini de kodla değiştirebilirsin ama şimdilik basit kalsın
+                TxtIcon.Foreground = Brushes.Red;
+                border1.BorderBrush = Brushes.Red;
+                okButton.Background= Brushes.Red;
             }
         }
 

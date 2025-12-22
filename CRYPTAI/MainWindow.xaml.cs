@@ -9,13 +9,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
-using Image = System.Windows.Controls.Image;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace CRYPTAI
@@ -67,20 +65,61 @@ namespace CRYPTAI
             Dispatcher.Invoke(() =>
             {
                 _backendService.KillProcess();
+
                 RepairDialog dialog = new RepairDialog();
                 dialog.Owner = this;
-                dialog.ShowDialog();
+                bool? result = dialog.ShowDialog();
 
                 if (dialog.IsRepairRequested)
                 {
-                    AppendToTerminal("KULLANICI: Onarım talep edildi. Sistem onarılıyor...");
+                    if (LoadingGrid != null) LoadingGrid.Visibility = Visibility.Visible;
+                    this.IsEnabled = false;
+
                     Properties.Settings.Default.IsDependenciesInstalled = false;
                     Properties.Settings.Default.Save();
-                    Task.Run(() => _backendService.StartBackend(forceCheck: true));
+
+                    AppendToTerminal("------------------------------------------------");
+                    AppendToTerminal("🛠️ SİSTEM ONARIMI BAŞLATILDI");
+                    AppendToTerminal("📦 Gerekli kütüphaneler indiriliyor ve kuruluyor...");
+                    AppendToTerminal("⏳ Lütfen bekleyin, terminali izleyin...");
+                    AppendToTerminal("------------------------------------------------");
+
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _backendService.StartBackend(forceCheck: true);
+
+                            AppendToTerminal("✅ KURULUM BAŞARIYLA TAMAMLANDI.");
+                            AppendToTerminal("🔄 UYGULAMA YENİDEN BAŞLATILIYOR...");
+
+                            await Task.Delay(2000);
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                string appPath = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+                                System.Diagnostics.Process.Start(appPath);
+
+                                Application.Current.Shutdown();
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            AppendToTerminal($"❌ KURULUM HATASI: {ex.Message}");
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                if (LoadingGrid != null) LoadingGrid.Visibility = Visibility.Collapsed;
+                                this.IsEnabled = true;
+                                ShowAlertDialog("KRİTİK HATA", "Kütüphaneler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.\n" + ex.Message, true);
+                            });
+                        }
+                    });
                 }
                 else
                 {
-                    AppendToTerminal("KULLANICI: Onarım reddedildi. Sistem kararsız.");
+                    AppendToTerminal("KULLANICI: Onarım reddedildi. Çıkış yapılıyor...");
+                    Application.Current.Shutdown();
                 }
             });
         }
@@ -202,6 +241,7 @@ _________________________________________________
                 TerminalOutput.ScrollToEnd();
             });
         }
+
         private void SetupDataGrids()
         {
             var grids = new[] { MyDataGrid };
@@ -220,10 +260,36 @@ _________________________________________________
                 leftStyle.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty, System.Windows.VerticalAlignment.Center));
                 leftStyle.Setters.Add(new Setter(TextBlock.PaddingProperty, new Thickness(10, 0, 0, 0)));
 
-                grid.Columns.Add(new DataGridTextColumn { Header = "Coin", Binding = new Binding("Symbol"), Width = new DataGridLength(1, DataGridLengthUnitType.Star), FontWeight = FontWeights.Bold, ElementStyle = leftStyle });
-                grid.Columns.Add(new DataGridTextColumn { Header = "Fiyat ($)", Binding = new Binding("Price"), Width = new DataGridLength(1, DataGridLengthUnitType.Auto), ElementStyle = leftStyle });
+                var centerStyle = new Style(typeof(TextBlock));
+                centerStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center));
+                centerStyle.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty, System.Windows.VerticalAlignment.Center));
 
-                var signalColumn = new DataGridTextColumn { Header = "İşlem", Binding = new Binding("SignalType"), Width = new DataGridLength(0.7, DataGridLengthUnitType.Star), FontWeight = FontWeights.Bold, ElementStyle = leftStyle };
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Coin",
+                    Binding = new Binding("Symbol"),
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                    FontWeight = FontWeights.Bold,
+                    ElementStyle = leftStyle
+                });
+
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Fiyat ($)",
+                    Binding = new Binding("Price"),
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Auto),
+                    ElementStyle = centerStyle
+                });
+
+                var signalColumn = new DataGridTextColumn
+                {
+                    Header = "İşlem",
+                    Binding = new Binding("SignalType"),
+                    Width = new DataGridLength(0.7, DataGridLengthUnitType.Star),
+                    FontWeight = FontWeights.Bold,
+                    ElementStyle = centerStyle
+                };
+
                 Style cellStyle = new Style(typeof(DataGridCell));
                 cellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new Binding("SignalColor")));
 
@@ -231,25 +297,56 @@ _________________________________________________
                 trigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, (SolidColorBrush)new BrushConverter().ConvertFrom("#446A6A")));
                 trigger.Setters.Add(new Setter(DataGridCell.BorderThicknessProperty, new Thickness(0)));
                 cellStyle.Triggers.Add(trigger);
+
                 signalColumn.CellStyle = cellStyle;
                 grid.Columns.Add(signalColumn);
 
                 if (i == 0)
                 {
-                    var riskColumn = new DataGridTextColumn { Header = "Risk", Binding = new Binding("RiskRatio"), Width = new DataGridLength(0.6, DataGridLengthUnitType.Star), FontWeight = FontWeights.Bold, ElementStyle = leftStyle };
+                    var riskColumn = new DataGridTextColumn
+                    {
+                        Header = "Risk",
+                        Binding = new Binding("RiskRatio"),
+                        Width = new DataGridLength(0.6, DataGridLengthUnitType.Star),
+                        FontWeight = FontWeights.Bold,
+                        ElementStyle = centerStyle
+                    };
+
                     Style riskStyle = new Style(typeof(DataGridCell));
                     riskStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new Binding("RiskColor")));
+
                     var riskTrigger = new Trigger { Property = DataGridCell.IsSelectedProperty, Value = true };
                     riskTrigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, (SolidColorBrush)new BrushConverter().ConvertFrom("#446A6A")));
                     riskTrigger.Setters.Add(new Setter(DataGridCell.BorderThicknessProperty, new Thickness(0)));
                     riskStyle.Triggers.Add(riskTrigger);
+
                     riskColumn.CellStyle = riskStyle;
                     grid.Columns.Add(riskColumn);
                 }
 
-                grid.Columns.Add(new DataGridTextColumn { Header = "Hedef ($)", Binding = new Binding("ExpectedPrice"), Width = new DataGridLength(1, DataGridLengthUnitType.Auto), ElementStyle = leftStyle });
-                grid.Columns.Add(new DataGridTextColumn { Header = "AI Tahmini", Binding = new Binding("AiPercentage") { StringFormat = "P4" }, Width = new DataGridLength(1, DataGridLengthUnitType.Star), ElementStyle = leftStyle });
-                grid.Columns.Add(new DataGridTextColumn { Header = "Hacim", Binding = new Binding("Volume") { StringFormat = "N0" }, Width = new DataGridLength(1, DataGridLengthUnitType.Star), ElementStyle = leftStyle });
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Hedef ($)",
+                    Binding = new Binding("ExpectedPrice"),
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Auto),
+                    ElementStyle = centerStyle
+                });
+
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "AI Tahmini",
+                    Binding = new Binding("AiPercentage") { StringFormat = "P4" },
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                    ElementStyle = centerStyle
+                });
+
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Hacim",
+                    Binding = new Binding("Volume") { StringFormat = "N0" },
+                    Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                    ElementStyle = centerStyle
+                });
             }
         }
 
@@ -485,6 +582,14 @@ _________________________________________________
                 if (FindVisualChild<T>(VisualTreeHelper.GetChild(parent, i)) is { } childOfChild) return childOfChild;
             }
             return null;
+        }
+
+        private void SearchText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ApplyFilters();
+            }
         }
     }
     

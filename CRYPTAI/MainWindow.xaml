@@ -146,7 +146,7 @@
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <TextBlock Text="Search Symbol:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center" FontFamily="Titillium Web SemiBold"/>
-                        <TextBox x:Name="SearchText" Width="150" Style="{StaticResource DarkTextBoxStyle}" />
+                        <TextBox x:Name="SearchText" Width="150" Style="{StaticResource DarkTextBoxStyle}" KeyDown="SearchText_KeyDown" />
 
                         <Button x:Name="SearchButton" Width="80" Style="{StaticResource SearchButtonStyle}" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Center" Height="22" Click="SearchButton_Click">
                             <TextBlock Text="ARA" Foreground="{StaticResource TextWhiteBrush}" FontWeight="Bold" VerticalAlignment="Center" FontFamily="Titillium Web SemiBold"/>
