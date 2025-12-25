@@ -12,11 +12,16 @@
 
   <ItemGroup>
     <None Remove="CRYPTAIII.png" />
+    <None Remove="cyrotai.png" />
+    <None Remove="IMGS\bullBear.png" />
     <None Remove="IMGS\closeButton.png" />
     <None Remove="IMGS\CRYPTAI.ico" />
     <None Remove="IMGS\CRYPTAII.ico" />
     <None Remove="IMGS\CRYPTAII.png" />
+    <None Remove="IMGS\CRYPTAIII.png" />
+    <None Remove="IMGS\cyrotai.png" />
     <None Remove="IMGS\homepage.png" />
+    <None Remove="IMGS\homepage1.png" />
     <None Remove="IMGS\LStar.png" />
     <None Remove="IMGS\minButton.png" />
     <None Remove="IMGS\Star.png" />
@@ -27,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="IMGS\bullBear.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="IMGS\closeButton.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
@@ -42,7 +50,16 @@
     <Resource Include="IMGS\CRYPTAII.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="IMGS\CRYPTAIII.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\cyrotai.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="IMGS\homepage.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="IMGS\homepage1.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="IMGS\LStar.png">

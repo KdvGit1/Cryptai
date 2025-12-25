@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CRYPTAI.Services
@@ -13,11 +14,15 @@ namespace CRYPTAI.Services
         // Logları arayüze göndermek için olay
         public event Action<string>? OnLogReceived;
 
-        // KRİTİK: Onarım gerektiğinde MainWindow'u tetikleyecek olay
+        // KRİTİK: Otomatik onarım (pip install) gerektiğinde tetiklenir
         public event Action? OnRecoveryNeeded;
 
-        // Sonsuz döngüye girmemesi için bayrak
+        // KRİTİK: Onarım işe yaramadıysa veya durum kötüyse tetiklenir (Alert Dialog için)
+        public event Action<string>? OnFatalError;
+
+        // Sonsuz döngüye girmemesi için bayraklar
         private bool _isRecoveryTriggered = false;
+        private DateTime _lastErrorTime = DateTime.MinValue;
 
         public async Task StartBackend(bool forceCheck = false)
         {
@@ -25,56 +30,73 @@ namespace CRYPTAI.Services
             {
                 try
                 {
-                    _isRecoveryTriggered = false; 
+                    _isRecoveryTriggered = false;
 
                     string exePath = AppDomain.CurrentDomain.BaseDirectory;
                     string projectPath = Path.Combine(exePath, "CryptoBackend");
 
+                    // Geliştirme ortamı vs. Canlı ortam yol kontrolü
                     if (!Directory.Exists(projectPath)) projectPath = Path.GetFullPath(Path.Combine(exePath, @"..\..\..\CryptoBackend"));
 
                     if (!Directory.Exists(projectPath))
                     {
-                        OnLogReceived?.Invoke("KRİTİK HATA: Backend dizini bulunamadı! Operasyon durduruldu.");
+                        string msg = "KRİTİK HATA: Backend dizini bulunamadı! 'CryptoBackend' klasörü eksik.";
+                        OnLogReceived?.Invoke(msg);
+                        OnFatalError?.Invoke(msg);
                         return;
                     }
 
-                    // Kütüphane kontrolü (İlk açılış veya zorunlu kontrol)
+                    // --- KÜTÜPHANE KONTROLÜ ---
                     if (forceCheck || !Properties.Settings.Default.IsDependenciesInstalled)
                     {
                         string reqFile = Path.Combine(projectPath, "requirements.txt");
                         if (File.Exists(reqFile))
                         {
-                            OnLogReceived?.Invoke("------------------------------------------------");
-                            OnLogReceived?.Invoke("SİSTEM: Kütüphane bütünlüğü ve kurulumu sağlanıyor...");
-                            OnLogReceived?.Invoke("PIP: İşlem biraz zaman alabilir, lütfen bekleyin...");
+                            LogToUi("------------------------------------------------");
+                            LogToUi("SİSTEM: Eksik kütüphaneler tespit edildi. Kurulum başlıyor...");
+                            LogToUi("PIP: İnternet hızınıza göre bu işlem 5-15 dakika sürebilir.");
 
                             bool installSuccess = InstallDependencies(projectPath);
 
                             if (installSuccess)
                             {
-                                OnLogReceived?.Invoke("✅ SİSTEM: Tüm kütüphaneler başarıyla kuruldu.");
+                                LogToUi("✅ SİSTEM: Tüm kütüphaneler başarıyla kuruldu.");
                                 Properties.Settings.Default.IsDependenciesInstalled = true;
                                 Properties.Settings.Default.Save();
                             }
                             else
                             {
-                                OnLogReceived?.Invoke("⚠️ UYARI: Bazı paketler yüklenemedi, yine de başlatılıyor.");
+                                LogToUi("⚠️ UYARI: Kurulum sırasında hatalar oluştu. Sistem yine de başlatılıyor...");
                             }
-                            OnLogReceived?.Invoke("------------------------------------------------");
+                            LogToUi("------------------------------------------------");
                         }
                     }
                     else
                     {
-                        OnLogReceived?.Invoke("SİSTEM: Kütüphaneler hazır (Önbellek).");
+                        LogToUi("SİSTEM: Kütüphaneler hazır (Önbellek).");
                     }
 
-                    if (_pythonProcess != null && !_pythonProcess.HasExited)
+                    // --- REVİZE EDİLDİ: GÜVENLİ PROCESS KONTROLÜ ---
+                    // Eski process dispose edilmişse erişim hatası vermemesi için try-catch eklendi
+                    bool isProcessRunning = false;
+                    try
                     {
-                        OnLogReceived?.Invoke("SİSTEM: Servis zaten çalışıyor.");
+                        isProcessRunning = _pythonProcess != null && !_pythonProcess.HasExited;
+                    }
+                    catch
+                    {
+                        // Eğer Handle hatası alırsak process zaten ölüdür, değişkene null basar geçeriz.
+                        _pythonProcess = null;
+                        isProcessRunning = false;
+                    }
+
+                    if (isProcessRunning)
+                    {
+                        LogToUi("SİSTEM: Servis zaten çalışıyor.");
                         return;
                     }
 
-                    // Python sunucusunu başlat
+                    // --- PYTHON SUNUCUSUNU BAŞLAT ---
                     var psi = new ProcessStartInfo
                     {
                         FileName = "cmd.exe",
@@ -91,64 +113,90 @@ namespace CRYPTAI.Services
 
                     psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
                     psi.EnvironmentVariables["PYTHONUTF8"] = "1";
+
                     _pythonProcess = new Process();
                     _pythonProcess.StartInfo = psi;
 
-                    _pythonProcess.OutputDataReceived += (s, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data)) OnLogReceived?.Invoke(e.Data);
-                    };
-
-                    _pythonProcess.ErrorDataReceived += (s, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            OnLogReceived?.Invoke($"> {e.Data}");
-                            CheckForMissingLibraryError(e.Data);
-                        }
-                    };
+                    _pythonProcess.OutputDataReceived += (s, e) => HandleProcessOutput(e.Data, false);
+                    _pythonProcess.ErrorDataReceived += (s, e) => HandleProcessOutput(e.Data, true);
 
                     _pythonProcess.Start();
                     _pythonProcess.BeginOutputReadLine();
                     _pythonProcess.BeginErrorReadLine();
 
-                    OnLogReceived?.Invoke("BACKEND: Sunucu başlatılıyor...");
+                    LogToUi("BACKEND: Sunucu başlatılıyor... (AI Modülleri Yükleniyor)");
                 }
                 catch (Exception ex)
                 {
-                    OnLogReceived?.Invoke($"SYSTEM FAILURE: {ex.Message}");
+                    string errorMsg = $"SYSTEM FAILURE: {ex.Message}";
+                    LogToUi(errorMsg);
+                    OnFatalError?.Invoke(errorMsg);
                 }
             });
         }
 
+        private void HandleProcessOutput(string? data, bool isErrorStream)
+        {
+            if (string.IsNullOrEmpty(data)) return;
+
+            string prefix = isErrorStream ? "> " : "";
+            OnLogReceived?.Invoke($"{prefix}{data}");
+
+            AnalyzeErrorForRecovery(data);
+        }
+
+        private void AnalyzeErrorForRecovery(string logLine)
+        {
+            if (_isRecoveryTriggered) return;
+
+            var match = Regex.Match(logLine, @"No module named ['""]([^'""]+)['""]", RegexOptions.IgnoreCase);
+            bool isImportError = logLine.Contains("ImportError") || logLine.Contains("ModuleNotFoundError");
+
+            if (match.Success || isImportError)
+            {
+                string missingModule = match.Success ? match.Groups[1].Value : "Bilinmeyen Modül";
+
+                if ((DateTime.Now - _lastErrorTime).TotalSeconds < 10) return;
+                _lastErrorTime = DateTime.Now;
+
+                LogToUi($"❌ KRİTİK EKSİK TESPİT EDİLDİ: {missingModule}");
+
+                // Her iki durumda da onarım tetikle
+                _isRecoveryTriggered = true;
+                OnRecoveryNeeded?.Invoke();
+            }
+        }
+
+        // --- REVİZE EDİLDİ: PROCESS TEMİZLİĞİ ---
         public void KillProcess()
         {
             try
             {
-                if (_pythonProcess is not null && !_pythonProcess.HasExited)
+                if (_pythonProcess is not null)
                 {
-                    Process.Start(new ProcessStartInfo
+                    try
                     {
-                        FileName = "taskkill",
-                        Arguments = $"/F /T /PID {_pythonProcess.Id}",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    });
+                        if (!_pythonProcess.HasExited)
+                        {
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = "taskkill",
+                                Arguments = $"/F /T /PID {_pythonProcess.Id}",
+                                CreateNoWindow = true,
+                                UseShellExecute = false
+                            });
+                        }
+                    }
+                    catch { /* Erişim reddedildi veya process zaten kapandı */ }
+
                     _pythonProcess.Dispose();
                 }
             }
-            catch { }
-        }
-
-        private void CheckForMissingLibraryError(string errorLog)
-        {
-            if (!_isRecoveryTriggered &&
-               (errorLog.Contains("ModuleNotFoundError") ||
-                errorLog.Contains("No module named") ||
-                errorLog.Contains("ImportError")))
+            catch { /* Genel hata yutucu */ }
+            finally
             {
-                _isRecoveryTriggered = true;
-                OnRecoveryNeeded?.Invoke();
+                // EN ÖNEMLİ KISIM: Değişkeni null yap ki StartBackend temiz başlasın
+                _pythonProcess = null;
             }
         }
 
@@ -159,7 +207,7 @@ namespace CRYPTAI.Services
                 var psi = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
-                    Arguments = "/c pip install -r requirements.txt --disable-pip-version-check",
+                    Arguments = "/c pip install -r requirements.txt --disable-pip-version-check --no-cache-dir",
                     WorkingDirectory = workingDir,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -186,12 +234,13 @@ namespace CRYPTAI.Services
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    bool exited = process.WaitForExit(300000);
+                    bool exited = process.WaitForExit(900000); // 15 dakika timeout
 
                     if (!exited)
                     {
                         process.Kill();
-                        OnLogReceived?.Invoke("PIP: Kurulum zaman aşımına uğradı!");
+                        OnLogReceived?.Invoke("PIP: Kurulum zaman aşımına uğradı (15dk).");
+                        OnFatalError?.Invoke("İnternet bağlantınız çok yavaş veya PyTorch sunucularına erişilemiyor. Lütfen manuel kurulum yapın.");
                         return false;
                     }
                     return process.ExitCode == 0;
@@ -202,6 +251,11 @@ namespace CRYPTAI.Services
                 OnLogReceived?.Invoke($"PIP HATASI: {ex.Message}");
                 return false;
             }
+        }
+
+        private void LogToUi(string message)
+        {
+            OnLogReceived?.Invoke(message);
         }
     }
 }

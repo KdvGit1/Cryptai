@@ -14,9 +14,10 @@ namespace CRYPTAI.Services
     {
         private readonly HttpClient _httpClient = new();
         private const string ApiUrl = "http://127.0.0.1:8000/get_last_data";
-        private const string ScanUrl = "http://127.0.0.1:8000/scan_market/15m/binance";
 
-        // Parametre olarak gelen FavoritesService kaldırıldı.
+        /// <summary>
+        /// API'den son piyasa verilerini çeker, analiz eder ve liste olarak döndürür.
+        /// </summary>
         public async Task<List<CoinItem>> GetMarketDataAsync()
         {
             var response = await _httpClient.GetStringAsync(ApiUrl);
@@ -58,8 +59,8 @@ namespace CRYPTAI.Services
 
                     string signalType = "NÖTR ➖";
                     SolidColorBrush signalColor = Brushes.Gray;
-                    if (aiRate > 0) { signalType = "LONG 🚀"; signalColor = Brushes.LimeGreen; }
-                    else if (aiRate < 0) { signalType = "SHORT 🔻"; signalColor = Brushes.Red; }
+                    if (aiRate > 0) { signalType = "LONG △"; signalColor = Brushes.LimeGreen; }
+                    else if (aiRate < 0) { signalType = "SHORT ▽"; signalColor = Brushes.Red; }
 
                     decimal volumeRisk = 0;
                     if (volume < 50000) volumeRisk = 100;
@@ -101,25 +102,21 @@ namespace CRYPTAI.Services
             return coinList;
         }
 
-        public async Task TriggerScanAsync()
+        /// <summary>
+        /// Seçilen borsa ve zaman dilimine göre backend tarafında tarama işlemini tetikler.
+        /// </summary>
+        public async Task TriggerScanAsync(string timeframe, string exchange)
         {
+            string dynamicUrl = $"http://127.0.0.1:8000/scan_market/{timeframe}/{exchange}";
+
             using (var scanClient = new HttpClient())
             {
-                // Zaman aşımını koruyoruz
                 scanClient.Timeout = TimeSpan.FromMinutes(20);
+                var response = await scanClient.GetAsync(dynamicUrl);
 
-                // İsteği gönderiyoruz
-                var response = await scanClient.GetAsync(ScanUrl);
-
-                // KRİTİK HAMLE 1: Eğer sunucu 200 OK dışında bir şey (404, 500 vs.) dönerse
-                // bu satır kodun akışını keser ve HATA fırlatır (Exception).
-                // Böylece MainWindow "Başarılı" mesajı göstermez, Catch bloğuna düşer.
                 response.EnsureSuccessStatusCode();
 
-                // KRİTİK HAMLE 2: Sunucudan gelen mesajı okuyoruz (İsteğe bağlı loglama için)
                 string responseContent = await response.Content.ReadAsStringAsync();
-
-                // Debug için çıktı penceresine yazdıralım
                 System.Diagnostics.Debug.WriteLine($"SCAN RESPONSE: {responseContent}");
             }
         }

@@ -96,22 +96,29 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10,10,10,20" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Image Width="100" Height="100" Source="/IMGS/CRYPTAII.png" Margin="0,0,8,0"/>
-                    <TextBlock Text="CRYPTAI" Foreground="{StaticResource PrimaryDarkBrush}" FontSize="36" FontFamily="Titillium Web SemiBold" FontWeight="Bold" VerticalAlignment="Center" TextDecorations="Underline"/>
+                    <Image Width="100" Height="100" Source="/IMGS/CRYPTAIII.png" Margin="0,0,8,0"/>
+                    <Image Width="170" Height="100" Source="/IMGS/cyrotai.png" />
                 </StackPanel>
 
                 <Border x:Name="Home" Grid.Row="2" 
-                BorderThickness="1" Height="65" 
-                VerticalAlignment="Top" CornerRadius="2,2,2,2" 
-                MouseEnter="Border_MouseEnter1" MouseLeave="Border_MouseLeave1" 
-                HorizontalAlignment="Center" 
-                BorderBrush="{StaticResource PrimaryDarkBrush}" 
-                Width="{Binding ActualWidth, ElementName=Border2, Mode=OneWay}" 
-                Margin="10,0,10,0">
+                    Height="65" 
+                    VerticalAlignment="Top" 
+                    CornerRadius="2,2,2,2" 
+                    BorderThickness="2" 
+                    MouseEnter="Border_MouseEnter1" MouseLeave="Border_MouseLeave1" 
+                    HorizontalAlignment="Center" 
+                    Width="{Binding ActualWidth, ElementName=Border2, Mode=OneWay}" 
+                    Margin="3,0,3,0">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                            <GradientStop Color="#FF0B65B0" Offset="0"/>
+                            <GradientStop Color="White" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="{Binding ActualWidth, ElementName=Home, Mode=OneWay}">
-                        <Image x:Name="HomeImage" Source="/IMGS/homepage.png" Margin="28,0,0,0" Width="60" Height="60"/>
-                        <TextBlock x:Name="HomePAGEText" Text="HOME" Foreground="{StaticResource PrimaryDarkBrush}" FontSize="24" Height="60" FontFamily="Titillium Web Black" TextAlignment="Center" Padding="5,10,0,0"/>
+                        <Image x:Name="HomeImage" Source="/IMGS/homepage1.png" Margin="28,0,0,0" Width="60" Height="60"/>
+                        <TextBlock x:Name="HomePAGEText" Text="HOME" FontSize="24" Height="60" FontFamily="Titillium Web Black" TextAlignment="Center" Padding="5,10,0,0" Foreground="White"/>
                     </StackPanel>
                 </Border>
 
@@ -135,12 +142,15 @@
                 <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,5">
                         <TextBlock Text="Exchange:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                        <ComboBox Width="100" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
+                        <ComboBox x:Name="borsaCombobox" Width="100" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
                             <ComboBoxItem Content="BINANCE"/>
+                            <ComboBoxItem Content="BITGET"/>
                         </ComboBox>
                         <TextBlock Text="Timeframe:" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                        <ComboBox Width="80" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
-                            <ComboBoxItem Content="15M"/>
+                        <ComboBox x:Name="timeFrameCombo" Width="80" SelectedIndex="0" Margin="0,0,15,0" Style="{StaticResource DarkComboBoxStyle}">
+                            <ComboBoxItem Content="5M"/>
+                            <ComboBoxItem Content="15M" IsSelected="True"/>
+                            <ComboBoxItem Content="1h"/>
                         </ComboBox>
                     </StackPanel>
 
@@ -159,24 +169,24 @@
                         <Button x:Name="StartScanButton" Click="StartScanButton_Click" Width="140" Style="{StaticResource SearchButtonStyle}" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" Height="22">
                             <Grid>
                                 <ProgressBar x:Name="ScanProgressBar" 
-                     Visibility="Collapsed" 
-                     IsIndeterminate="True" 
-                     Height="22" 
-                     VerticalAlignment="Stretch" 
-                     HorizontalAlignment="Stretch" 
-                     Opacity="0.5" 
-                     Foreground="#00FFFF" 
-                     BorderThickness="0" 
-                     Background="Transparent"/>
+                      Visibility="Collapsed" 
+                      IsIndeterminate="True" 
+                      Height="22" 
+                      VerticalAlignment="Stretch" 
+                      HorizontalAlignment="Stretch" 
+                      Opacity="0.5" 
+                      Foreground="#00FFFF" 
+                      BorderThickness="0" 
+                      Background="Transparent"/>
 
                                 <TextBlock x:Name="ScanButtonText" 
-                   Text="TARAMAYI BAŞLAT 🚀" 
-                   Foreground="{StaticResource TextWhiteBrush}" 
-                   FontWeight="Bold" 
-                   VerticalAlignment="Center" 
-                   HorizontalAlignment="Center" 
-                   FontFamily="Titillium Web SemiBold" 
-                   FontSize="11"/>
+                    Text="TARAMAYI BAŞLAT 🚀" 
+                    Foreground="{StaticResource TextWhiteBrush}" 
+                    FontWeight="Bold" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" 
+                    FontFamily="Titillium Web SemiBold" 
+                    FontSize="11"/>
                             </Grid>
                         </Button>
                     </StackPanel>
@@ -209,7 +219,7 @@
 
                     <TextBlock x:Name="TextBlock" Text="STRENGTH SORTED (Hybrid Risk Score)" Foreground="{StaticResource TextWhiteBrush}" FontWeight="Bold" FontSize="16" FontFamily="Titillium Web SemiBold" HorizontalAlignment="Left"/>
                     <Rectangle Grid.Row="1" Height="2" Fill="{StaticResource TextWhiteBrush}" HorizontalAlignment="Left" Width="{Binding ActualWidth, ElementName=TextBlock}"/>
-                    <DataGrid Grid.Row="2" x:Name="MyDataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource CustomDataGridStyle}" Margin="5,10,5,5" AutoGenerateColumns="True" MouseDoubleClick="MyDataGrid_MouseDoubleClick" SelectionChanged="MyDataGrid_SelectionChanged" />
+                    <DataGrid Grid.Row="2" x:Name="MyDataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource CustomDataGridStyle}" Margin="5,10,5,5" AutoGenerateColumns="True" MouseDoubleClick="MyDataGrid_MouseDoubleClick" />
                 </Grid>
             </Border>
 
@@ -225,27 +235,44 @@
                     <TextBlock Grid.Row="0" Text="LIVE LOGS/ MUM VERİSİ" Foreground="{StaticResource TextWhiteBrush}" FontWeight="Bold" FontSize="16" FontFamily="Titillium Web SemiBold" HorizontalAlignment="Left" Margin="0,0,0,5" x:Name="TextBlockAI"/>
                     <Rectangle Grid.Row="1" Height="2" Fill="{StaticResource TextWhiteBrush}" HorizontalAlignment="Left" Width="{Binding ActualWidth, ElementName=TextBlockAI}"/>
 
-                    <Border x:Name="SentimentBorder" Grid.Row="2" Margin="0,15,0,5" CornerRadius="4" Height="28" ClipToBounds="True" Background="#202020">
+                    <Border x:Name="SentimentBorder" Grid.Row="2" Margin="0,15,0,5" 
+        CornerRadius="4" Height="28" Background="#202020" 
+        UseLayoutRounding="True" SnapsToDevicePixels="True" 
+        ClipToBounds="True" 
+        SizeChanged="SentimentBorder_SizeChanged">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="ColBull" Width="50*"/>
                                 <ColumnDefinition x:Name="ColBear" Width="50*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Column="0" Background="LimeGreen" CornerRadius="10,0,0,10">
+                            <Border Grid.Column="0" Background="#24E500" x:Name="BorderLong" CornerRadius="4,0,0,4">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0">
-                                    <TextBlock Text="▲ LONG" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas"/>
+                                    <TextBlock Text="△ LONG" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas"/>
                                     <TextBlock x:Name="TxtLongRate" Text="%50" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas" Margin="5,0,0,0"/>
                                 </StackPanel>
                             </Border>
-                            <Border Grid.Column="1" Background="Red" CornerRadius="0,10,10,0" >
+
+                            <Border Grid.Column="1" Background="#FF0000" x:Name="BorderShort" CornerRadius="0,4,4,0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
                                     <TextBlock x:Name="TxtShortRate" Text="%50" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas" Margin="0,0,5,0"/>
-                                    <TextBlock Text="SHORT ▼" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas"/>
+                                    <TextBlock Text="SHORT ▽" FontWeight="Bold" Foreground="White" FontSize="11" FontFamily="Consolas"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Grid.ColumnSpan="2" Width="2" HorizontalAlignment="Center" Background="White" Opacity="0.3"/>
+                            <Canvas Grid.ColumnSpan="2" x:Name="IconCanvas" VerticalAlignment="Center" Height="30">
+                                <Grid x:Name="IconContainer" Width="30" Height="30" Canvas.Top="-1">
+                                    <Border Width="2" Height="28" Background="White" Opacity="0.8" HorizontalAlignment="Center"/>
+
+                                    <Image x:Name="BullBearIcon" 
+                       Source="D:\MASAÜSTÜ\SOFTWARE\C#\CRYPTAI\CRYPTAI\IMGS\bullBear.png" 
+                       Width="30" Height="30">
+                                        <Image.Effect>
+                                            <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.4"/>
+                                        </Image.Effect>
+                                    </Image>
+                                </Grid>
+                            </Canvas>
                         </Grid>
                     </Border>
 
@@ -261,7 +288,7 @@
                                     <TextBlock Text="> LIVE SYSTEM LOGS" Foreground="#00FFFF" FontSize="10" Margin="5,2,0,2" FontFamily="Consolas" FontWeight="Bold"/>
                                     <TextBox x:Name="TerminalOutput" Grid.Row="1" Foreground="#00FFFF" FontFamily="Consolas" FontSize="11" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Padding="5">
                                         <TextBox.Background>
-                                            <ImageBrush ImageSource="/CRYPTAIII.png" Stretch="Uniform" Opacity="0.05"/>
+                                            <ImageBrush ImageSource="/IMGS/CRYPTAIII.png" Stretch="Uniform" Opacity="0.05"/>
                                         </TextBox.Background>
                                     </TextBox>
                                 </Grid>
