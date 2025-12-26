@@ -1,0 +1,55 @@
+﻿<Window x:Class="CRYPTAI.RepairDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sistem Onarımı" Height="250" Width="450"
+        WindowStyle="None" ResizeMode="NoResize"
+        AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+
+    <Border Background="#CC1E222D" BorderBrush="#F0B90B" BorderThickness="1" CornerRadius="10">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="5" Opacity="0.8"/>
+        </Border.Effect>
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="⚠️" FontSize="24" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="#F0B90B"/>
+                <TextBlock Text="SİSTEM BÜTÜNLÜĞÜ BOZULDU" Foreground="#F0B90B" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <TextBlock Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="14">
+                Arka plan servisleri çalışırken kritik kütüphanelerin eksik olduğu tespit edildi.
+                <LineBreak/><LineBreak/>
+                Sistemin kendini onarmasını ve eksik dosyaları yüklemesini ister misiniz?
+            </TextBlock>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                <Button x:Name="BtnRepair" Content="ONAR VE BAŞLAT" Click="BtnRepair_Click"
+                        Width="180" Height="35" Background="#F0B90B" Foreground="#1E222D"
+                        FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button x:Name="BtnCancel" Content="İPTAL" Click="BtnCancel_Click"
+                        Width="100" Height="35" Margin="15,0,0,0" Background="#FF84271F" Foreground="White"
+                        FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
